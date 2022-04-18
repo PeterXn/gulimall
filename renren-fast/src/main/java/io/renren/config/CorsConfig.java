@@ -12,7 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+/**
+ * Configuration注释，与网关与跨域处理已重复
+ */
+//@Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
     @Override
