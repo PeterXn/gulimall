@@ -39,7 +39,7 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
         return new PageUtils(page);
     }
 
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @Override
     public void updateDetail(BrandEntity brand) {
         // 保证冗余字段的数据一致

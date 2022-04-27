@@ -38,7 +38,9 @@ public class GulimallExceptionControllerAdvice {
 
     @ExceptionHandler(value = Throwable.class)
     public R handleException(Throwable throwable) {
-        log.error("数据检验出现异常:{}，异常类型:{}", throwable.getMessage(), throwable.getClass());
+        throwable.printStackTrace();
+
+        log.error("未知异常: {}", throwable.getMessage());
 
         return R.error(BizCodeEnum.UNKNOWN_EXCEPTION.getCode(),BizCodeEnum.UNKNOWN_EXCEPTION.getMsg()).put("data", throwable.getMessage());
     }

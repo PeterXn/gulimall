@@ -79,7 +79,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 级联更新所有的数据
      * @param category
      */
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     @Override
     public void updateCascade(CategoryEntity category) {
         this.updateById(category);
