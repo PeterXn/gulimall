@@ -1,7 +1,5 @@
 package com.atguigu.common.constant;
 
-import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
-
 /**
  * Created with IntelliJ IDEA.
  * To change it use File | Settings | Editor | File and Code Templates.

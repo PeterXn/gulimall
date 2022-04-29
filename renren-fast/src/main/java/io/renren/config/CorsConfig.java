@@ -15,15 +15,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Configuration注释，与网关与跨域处理已重复
  */
-//@Configuration
+@Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowedOrigins("*")
-            .allowCredentials(true)
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .maxAge(3600);
-    }
+    //TODO 与网关与跨域处理已重复所以注释
+
+    //@Override
+    //public void addCorsMappings(CorsRegistry registry) {
+    //    registry.addMapping("/**")
+    //        .allowedOrigins("*")
+    //        .allowCredentials(true)
+    //        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+    //        .maxAge(3600);
+    //}
 }

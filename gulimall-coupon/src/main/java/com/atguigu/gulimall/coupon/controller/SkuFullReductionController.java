@@ -1,15 +1,14 @@
 package com.atguigu.gulimall.coupon.controller;
 
+import java.lang.annotation.Retention;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.common.to.SkuReductionTo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.coupon.entity.SkuFullReductionEntity;
 import com.atguigu.gulimall.coupon.service.SkuFullReductionService;
@@ -31,6 +30,17 @@ public class SkuFullReductionController {
     @Autowired
     private SkuFullReductionService skuFullReductionService;
 
+    /**
+     * product系统远程调用
+     * @param reductionTo
+     * @return
+     */
+    @PostMapping("/saveInfo")
+    public R saveInfo(@RequestBody SkuReductionTo reductionTo) {
+        skuFullReductionService.saveSkuReduction(reductionTo);
+
+        return R.ok();
+    }
     /**
      * 列表
      */
