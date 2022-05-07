@@ -6,7 +6,7 @@ package com.atguigu.common.exception;
  *
  * @author Peter
  * @date 2022/4/22 11:20
- * @description TODO
+ * @description 全局异常类
  */
 /***
  * 错误码和错误信息定义类
@@ -25,7 +25,8 @@ package com.atguigu.common.exception;
  */
 public enum BizCodeEnum {
     UNKNOWN_EXCEPTION(10000,"系统未知异常"),
-    VALID_EXCEPTION(10001,"参数格式校验异常");
+    VALID_EXCEPTION(10001,"参数格式校验异常"),
+    PRODUCT_UP_EXCEPTION(11000,"商品上架异常");
 
     private Integer code;
     private String msg;
