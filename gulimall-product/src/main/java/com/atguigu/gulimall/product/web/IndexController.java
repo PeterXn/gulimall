@@ -51,4 +51,10 @@ public class IndexController {
 
         return catalogJson;
     }
+
+    @ResponseBody
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello";
+    }
 }
