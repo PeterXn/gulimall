@@ -42,7 +42,13 @@ public class R extends HashMap<String, Object> {
 		return t;
 	}
 
-	//利用fastjson进行反序列化
+	/**
+	 * 利用fastjson进行反序列化
+	 * @param key
+	 * @param typeReference
+	 * @param <T>
+	 * @return
+	 */
 	public <T> T getData(String key,TypeReference<T> typeReference) {
 		//默认是map
 		Object data = get(key);

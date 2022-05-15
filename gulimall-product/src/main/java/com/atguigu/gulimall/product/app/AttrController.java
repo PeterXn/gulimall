@@ -69,7 +69,7 @@ public class AttrController {
 
 
     /**
-     * 信息
+     * 远程调用使用-信息
      */
     @RequestMapping("/info/{attrId}")
     //@RequiresPermissions("product:attr:info")

@@ -59,6 +59,15 @@ public class GulimallSearchApplicationTests {
         private String state;
     }
 
+
+    @Test
+    public void testStr() {
+        String str = "keyword=%E5%8D%8E%E4%B8%BA&attrs=5_A2639;A2638;A2637";
+        String attr = "&attrs=5_A2639;A2638;A2637";
+        String replace = str.replace(attr, "");
+        System.out.println("replace = " + replace);
+    }
+
     @Test
     public void searchData() throws IOException {
         // 1.创建检索要求
