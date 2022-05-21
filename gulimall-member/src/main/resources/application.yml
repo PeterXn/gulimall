@@ -10,6 +10,9 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+  session:
+    store-type: redis
+
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:

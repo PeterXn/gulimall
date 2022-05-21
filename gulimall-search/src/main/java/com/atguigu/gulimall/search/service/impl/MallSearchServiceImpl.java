@@ -335,6 +335,7 @@ public class MallSearchServiceImpl implements MallSearchService {
             catalogVo.setCatalogName(catalog_name);
 
             catalogVos.add(catalogVo);
+
         }
 
         result.setCatalogs(catalogVos);
@@ -417,7 +418,6 @@ public class MallSearchServiceImpl implements MallSearchService {
         }
 
         // TODO 分类的面包屑导航；不需要导航取消
-
 
         return result;
     }

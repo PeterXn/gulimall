@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
+            <version>1.18.14</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
@@ -78,6 +78,18 @@
         <!--    <artifactId>spring-cloud-starter-bootstrap</artifactId>-->
         <!--    <version>3.0.1</version>-->
         <!--</dependency>-->
+
+        <!--HttpUtils需要的所有依赖-->
+        <!--<dependency>-->
+        <!--    <groupId>com.alibaba</groupId>-->
+        <!--    <artifactId>fastjson</artifactId>-->
+        <!--    <version>1.2.15</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.1</version>
+        </dependency>
 
 
     </dependencies>
