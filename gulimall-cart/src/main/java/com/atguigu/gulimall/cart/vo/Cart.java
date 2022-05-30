@@ -87,7 +87,9 @@ public class Cart {
         if (!CollectionUtils.isEmpty(items)) {
             for (CartItem cartItem : items) {
                 if (cartItem.getCheck()) {
-                    amount = amount.add(cartItem.getTotalPrice());
+                    if (cartItem.getCheck()) {
+                        amount = amount.add(cartItem.getTotalPrice());
+                    }
                 }
             }
         }

@@ -1,13 +1,13 @@
 package com.atguigu.gulimall.ware.controller;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.common.validator.group.QcloudGroup;
 import com.atguigu.gulimall.ware.vo.MergeVo;
 import com.atguigu.gulimall.ware.vo.PurchaseDoneVo;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
