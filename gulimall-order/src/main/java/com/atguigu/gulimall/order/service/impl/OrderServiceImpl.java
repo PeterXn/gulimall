@@ -2,6 +2,7 @@ package com.atguigu.gulimall.order.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.constant.OrderConstant;
+import com.atguigu.common.enume.OrderStatusEnum;
 import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.to.mq.OrderTo;
 import com.atguigu.common.utils.PageUtils;
@@ -11,7 +12,7 @@ import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.order.dao.OrderDao;
 import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.atguigu.gulimall.order.entity.OrderItemEntity;
-import com.atguigu.gulimall.order.enume.OrderStatusEnum;
+import com.atguigu.gulimall.order.entity.PaymentInfoEntity;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
 import com.atguigu.gulimall.order.feign.ProductFeignService;
@@ -19,6 +20,7 @@ import com.atguigu.gulimall.order.feign.WareFeignService;
 import com.atguigu.gulimall.order.interceptor.LoginUserInterceptor;
 import com.atguigu.gulimall.order.service.OrderItemService;
 import com.atguigu.gulimall.order.service.OrderService;
+import com.atguigu.gulimall.order.service.PaymentInfoService;
 import com.atguigu.gulimall.order.to.OrderCreateTo;
 import com.atguigu.gulimall.order.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,6 +28,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +42,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -50,6 +56,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     OrderItemService orderItemService;
+
+    @Autowired
+    PaymentInfoService paymentInfoService;
 
     @Autowired
     MemberFeignService memberFeignService;
@@ -281,8 +290,86 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             OrderTo orderTo = new OrderTo();
             BeanUtils.copyProperties(byId, orderTo);
             orderTo.setStatus(update.getStatus());
-            rabbitTemplate.convertAndSend("order-event-exchange","order.release.other",orderTo);
+            //TODO 确保消息一定会发送出去，每一个消息都做好日志记录。持久化到数据库
+            //TODO 定期扫描数据库时失败的消息再发送一遍。
+            try {
+                rabbitTemplate.convertAndSend("order-event-exchange","order.release.other",orderTo);
+            } catch (AmqpException e) {
+                e.printStackTrace();
+                //TODO 将没法发送成功的消息进行再次发送
+            }
         }
+    }
+
+    @Override
+    public PayVo getOrderPay(String orderSn) {
+        PayVo payVo = new PayVo();
+        OrderEntity order = this.getOrderByOrderSn(orderSn);
+
+        BigDecimal scale = order.getPayAmount().setScale(2, BigDecimal.ROUND_HALF_UP);
+        payVo.setTotal_amount(scale.toString());
+        payVo.setOut_trade_no(orderSn);
+
+        List<OrderItemEntity> itemEntities = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", orderSn));
+        OrderItemEntity entity = itemEntities.get(0);
+        payVo.setSubject(entity.getSkuName());
+        payVo.setBody(entity.getSkuAttrsVals());
+
+        return payVo;
+    }
+
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+        MemberRespVo memberRespVo = LoginUserInterceptor.loginUser.get();
+
+        IPage<OrderEntity> page = this.page(
+                new Query<OrderEntity>().getPage(params),
+                new QueryWrapper<OrderEntity>().eq("member_id", memberRespVo.getId()).orderByDesc("id")
+        );
+
+        List<OrderEntity> order_sn = page.getRecords().stream().map(order -> {
+            List<OrderItemEntity> itemEntities = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", order.getOrderSn()));
+
+            order.setItemEntities(itemEntities);
+            return order;
+        }).collect(Collectors.toList());
+
+        page.setRecords(order_sn);
+
+        return new PageUtils(page);
+
+
+
+    }
+
+    /**
+     * 处理支付宝的支付结果
+     * @param vo
+     * @return
+     */
+    @Override
+    public String handlePayResult(PayAsyncVo vo) {
+
+        //1.保存交易流水
+        PaymentInfoEntity infoEntity = new PaymentInfoEntity();
+        infoEntity.setAlipayTradeNo(vo.getTrade_no());
+        infoEntity.setOrderSn(vo.getOut_trade_no());
+        infoEntity.setPaymentStatus(vo.getTrade_status());
+        infoEntity.setCallbackTime(vo.getNotify_time());
+
+        paymentInfoService.save(infoEntity);
+
+        //修改订单表的状态
+        String status = vo.getTrade_status();
+        if ("TRADE_SUCCESS".equals(status) || "TRADE_FINISHED".equals(status)) {
+            //支付成功
+            String orderSn = vo.getOut_trade_no();
+            this.baseMapper.updateOrderStatus(orderSn,OrderStatusEnum.PAYED.getCode());
+
+            return "success";
+        }
+
+        return null;
     }
 
     /**

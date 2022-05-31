@@ -48,6 +48,19 @@ public class OrderController {
 
 
     /**
+     * 供会员系统远程调用，查出当前用户的所有订单
+     * 远程调用都使用PostMapping
+     */
+    @RequestMapping("/listWithItem")
+    //@RequiresPermissions("order:order:list")
+    public R listWithItem(@RequestBody Map<String, Object> params){
+        PageUtils page = orderService.queryPageWithItem(params);
+
+        return R.ok().put("page", page);
+    }
+
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{id}")

@@ -1,4 +1,4 @@
-package com.atguigu.gulimall.order.interceptor;
+package com.atguigu.gulimall.member.interceptor;
 
 import com.atguigu.common.constant.AuthServerConstant;
 import com.atguigu.common.vo.MemberRespVo;
@@ -26,13 +26,10 @@ public class LoginUserInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         //解锁库存时查询订单的远程调用
-        //请求路径是/order/order/status/{orderSn}，直接放行
+        //请求路径是/member/**，直接放行
         String uri = request.getRequestURI();
-        AntPathMatcher antPathMatcher = new AntPathMatcher();
-        boolean match = antPathMatcher.match("/order/order/status/**", uri);
-        //放行支付宝异步通知请求
-        boolean payedMatch = antPathMatcher.match("/payed/notify", uri);
-        if (match || payedMatch) {
+        boolean match = new AntPathMatcher().match("/member/**", uri);
+        if (match) {
             return true;
         }
 

@@ -23,7 +23,7 @@
             <a href="http://auth.gulimall.com/loguot.html" class="li_2">立即退出</a>
           </li>
           <li>
-            <a href="http://order.gulimall.com/list.html">我的订单</a>
+            <a href="http://member.gulimall.com/memberOrder.html">我的订单</a>
           </li>
           <li>支付帮助</li>
         </ul>
@@ -112,7 +112,9 @@
             <img src="/static/order/pay/img/weixin.png" alt="">微信支付
           </li>
 		  <li>
-            <img src="/static/order/pay/img/zhifubao.png" style="weight:auto;height:30px;" alt="">支付宝
+            <a th:href="'http://order.gulimall.com/payOrder?orderSn='+${submitOrderResp.order.orderSn}">
+            <img src="/static/order/pay/img/zhifubao.png" style="weight:auto;height:30px;" >支付宝
+            </a>
           </li>
         </ul>
       </div>
@@ -120,7 +122,7 @@
         <p>
           <span>Copyright @2004-2017 谷粒学院gulimall.com 版权所有</span>
           <span>
-            <img src="/static/order/pay/img/foots.png" alt="">
+            <img src="/static/order/pay/img/foots.png" >
           </span>
         </p>
       </div>
