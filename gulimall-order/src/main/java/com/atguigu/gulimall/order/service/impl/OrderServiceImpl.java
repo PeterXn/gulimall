@@ -5,6 +5,7 @@ import com.atguigu.common.constant.OrderConstant;
 import com.atguigu.common.enume.OrderStatusEnum;
 import com.atguigu.common.exception.NoStockException;
 import com.atguigu.common.to.mq.OrderTo;
+import com.atguigu.common.to.mq.SeckillOrderTo;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 import com.atguigu.common.utils.R;
@@ -22,6 +23,7 @@ import com.atguigu.gulimall.order.service.OrderItemService;
 import com.atguigu.gulimall.order.service.OrderService;
 import com.atguigu.gulimall.order.service.PaymentInfoService;
 import com.atguigu.gulimall.order.to.OrderCreateTo;
+import com.atguigu.gulimall.order.to.SkuInfoTo;
 import com.atguigu.gulimall.order.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -370,6 +372,49 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         }
 
         return null;
+    }
+
+    /**
+     * 创建秒杀定单
+     */
+    @Transactional(rollbackFor = RuntimeException.class)
+    @Override
+    public void createSeckillOrder(SeckillOrderTo seckillOrderTo) {
+        //TODO 保存定单信息
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderSn(seckillOrderTo.getOrderSn());
+        orderEntity.setMemberId(seckillOrderTo.getMemberId());
+
+        orderEntity.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        BigDecimal multiply = seckillOrderTo.getSeckillPrice().multiply(new BigDecimal(seckillOrderTo.getNum()));
+        orderEntity.setPayAmount(multiply);
+
+        orderEntity.setModifyTime(new Date());
+        this.save(orderEntity);
+
+        //保存定单项
+        OrderItemEntity itemEntity = new OrderItemEntity();
+        itemEntity.setOrderSn(seckillOrderTo.getOrderSn());
+        itemEntity.setRealAmount(multiply);
+        itemEntity.setSkuPrice(seckillOrderTo.getSeckillPrice());
+
+        itemEntity.setSkuQuantity(seckillOrderTo.getNum());
+        //TODO 获取sku的详细信息
+        R r = productFeignService.getSkuInfo(seckillOrderTo.getSkuId());
+        if (r.getCode() == 0) {
+            SkuInfoTo skuInfoTo = r.getData("skuInfo",new TypeReference<SkuInfoTo>() {
+            });
+            if (skuInfoTo != null) {
+                //3.商品的sku信息
+                itemEntity.setSkuId(skuInfoTo.getSkuId());
+                itemEntity.setSkuName(skuInfoTo.getSkuName());
+                itemEntity.setSkuPic(skuInfoTo.getSkuDefaultImg());
+                itemEntity.setCategoryId(skuInfoTo.getCatalogId());
+                itemEntity.setSpuId(skuInfoTo.getSpuId());
+            }
+        }
+
+        orderItemService.save(itemEntity);
     }
 
     /**

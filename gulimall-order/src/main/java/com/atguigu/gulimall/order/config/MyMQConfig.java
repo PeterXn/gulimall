@@ -81,4 +81,25 @@ public class MyMQConfig {
                 "order.release.other.#",
                 null);
     }
+
+
+    /**
+     * 秒杀定单队列
+     */
+    @Bean
+    public Queue orderSeckillOrderQueue() {
+        return new Queue("order.seckill.order.queue", true, false, false, null);
+    }
+
+    /**
+     * 绑定秒杀队列
+     */
+    @Bean
+    public Binding orderSeckillOrderQueueBinding() {
+        return new Binding("order.seckill.order.queue",
+                Binding.DestinationType.QUEUE,
+                "order-event-exchange",
+                "order.seckill.order",
+                null);
+    }
 }

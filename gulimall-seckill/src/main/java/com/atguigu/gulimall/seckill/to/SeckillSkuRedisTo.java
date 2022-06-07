@@ -1,19 +1,17 @@
-package com.atguigu.gulimall.product.vo;
+package com.atguigu.gulimall.seckill.to;
 
+import com.atguigu.gulimall.seckill.vo.SkuInfoVo;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 /**
- * Created with IntelliJ IDEA.
- * To change it use File | Settings | Editor | File and Code Templates.
- *
  * @author Peter
- * @date 2022/5/16 21:57
+ * @date 2022/6/2 0:20
  * @description Usage
  */
 @Data
-public class SeckillSkuInfoVo {
+public class SeckillSkuRedisTo {
 
     /**
      * 活动id
@@ -49,10 +47,11 @@ public class SeckillSkuInfoVo {
      */
     private Integer seckillSort;
 
+    private SkuInfoVo skuInfo;
+
     /**
      * 当前商品秒杀的开始时间，结束时间
      */
     private Long startTime;
     private Long endTime;
-
 }

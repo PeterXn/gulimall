@@ -1,12 +1,16 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.dao.SkuInfoDao;
 import com.atguigu.gulimall.product.entity.SkuImagesEntity;
 import com.atguigu.gulimall.product.entity.SkuInfoEntity;
 import com.atguigu.gulimall.product.entity.SpuInfoDescEntity;
+import com.atguigu.gulimall.product.feign.SeckillFeignService;
 import com.atguigu.gulimall.product.service.*;
+import com.atguigu.gulimall.product.vo.SeckillSkuInfoVo;
 import com.atguigu.gulimall.product.vo.SkuItemSaleAttrVo;
 import com.atguigu.gulimall.product.vo.SkuItemVo;
 import com.atguigu.gulimall.product.vo.SpuItemAttrGroupVo;
@@ -39,6 +43,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Autowired
+    SeckillFeignService seckillFeignService;
 
     @Autowired
     ThreadPoolExecutor executor;
@@ -166,8 +173,20 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             System.out.println("baseAttrFuture....4");
         }, executor);
 
+
+        //3.当前商品是否参与秒杀优惠
+        CompletableFuture<Void> seckillFuture = CompletableFuture.runAsync(() -> {
+            R r = seckillFeignService.getSkuSeckillInfo(skuId);
+            if (r.getCode() == 0) {
+                SeckillSkuInfoVo seckillSkuInfoVo = r.getData(new TypeReference<SeckillSkuInfoVo>() {
+                });
+                skuItemVo.setSeckillSkuInfoVo(seckillSkuInfoVo);
+            }
+        }, executor);
+
+
         // 等待所有任务完成
-        CompletableFuture.allOf(saleAttrFuture,descFuture,baseAttrFuture,imageFuture).get();
+        CompletableFuture.allOf(saleAttrFuture,descFuture,baseAttrFuture,imageFuture,seckillFuture).get();
 
         return skuItemVo;
     }

@@ -17,3 +17,9 @@
 #      id-type: auto
 #server:
 #  port: 7000
+
+
+spring:
+  jackson:
+    time-zone: GMT+8
+#    date-format: yyyy-MM-dd HH:mm:ss
